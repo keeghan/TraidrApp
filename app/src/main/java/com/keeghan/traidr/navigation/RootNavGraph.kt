@@ -8,6 +8,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.keeghan.traidr.ui.screens.MainScreen
 
+/**
+ * Main Graph, containing AuthGraph, and MainScreen with BottomNavigationBar
+* */
 @Composable
 fun RootNavGraph(navController: NavHostController) {
     NavHost(
@@ -22,9 +25,11 @@ fun RootNavGraph(navController: NavHostController) {
     }
 }
 
+//Contains Top level GraphRoutes
 object Graph {
     const val ROOT = "root_graph"
-    const val AUTHENTICATION = "ath_graph"
+    const val AUTHENTICATION = "auth_graph"
     const val MAIN = "main_graph"
     const val ORDER = "order_graph"
+    const val SETTINGS = "settings"
 }

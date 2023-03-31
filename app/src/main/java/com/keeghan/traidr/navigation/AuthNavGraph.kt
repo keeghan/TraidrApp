@@ -4,26 +4,45 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.keeghan.traidr.navigation.AuthScreen.*
 import com.keeghan.traidr.ui.screens.LoginScreen
 import com.keeghan.traidr.ui.screens.ResetScreen
 import com.keeghan.traidr.ui.screens.SignUpScreen
 
+/**
+ * AuthNavGraph with contains Login,SignUp and Reset Screens
+ * This is contained with the RootNav AlongSide the MainScreen
+ * */
 fun NavGraphBuilder.authNavGraph(navController: NavController) {
     navigation(
         route = Graph.AUTHENTICATION,
-        startDestination = AuthScreen.Login.route
+        startDestination = Login.route
     ) {
-        composable(route = AuthScreen.Login.route) {
+        composable(route = Login.route) {
             LoginScreen(onLoginClick = {
-                navController.navigate(Graph.MAIN)
-            })
+                if (it){
+                    navController.navigate(Graph.MAIN) {
+                        popUpTo(Login.route) { inclusive = true }
+                    }
+                }
+            },
+                onSignUpClick = {
+                    navController.navigate(SignUp.route)
+                })
         }
-        composable(route = AuthScreen.SignUp.route) {
-            SignUpScreen(onSignUpClick = {
-                navController.navigate(AuthScreen.Login.route)
-            })
+        composable(route = SignUp.route) {
+            SignUpScreen(
+                onSignUpClick = {
+                    navController.navigate(Graph.MAIN)
+                },
+                onLoginClick = {
+                    navController.navigate(Login.route)  {
+                        popUpTo(SignUp.route) { inclusive = true }
+                    }
+                }
+            )
         }
-        composable(route = AuthScreen.Reset.route) {
+        composable(route = Reset.route) {
             ResetScreen()
         }
     }

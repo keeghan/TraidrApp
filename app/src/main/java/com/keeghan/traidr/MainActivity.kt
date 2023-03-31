@@ -9,8 +9,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.keeghan.traidr.navigation.RootNavGraph
-import com.keeghan.traidr.ui.screens.LoginScreen
-import com.keeghan.traidr.ui.screens.SignUpScreen
 import com.keeghan.traidr.ui.theme.TraidrTheme
 import dagger.hilt.android.AndroidEntryPoint
 

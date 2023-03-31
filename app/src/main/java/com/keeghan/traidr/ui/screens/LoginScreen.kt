@@ -2,35 +2,70 @@ package com.keeghan.traidr.ui.screens
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.MutableLiveData
+import com.keeghan.traidr.R
 import com.keeghan.traidr.utils.Constants.Companion.CHECK_CAPITAL
 import com.keeghan.traidr.utils.Constants.Companion.CHECK_SYMBOL_DIGIT
+import com.keeghan.traidr.utils.hashPassword
+import com.keeghan.traidr.viewmodels.LoginViewModel
+import com.keeghan.traidr.viewmodels.SignUpViewModel
 
 
 @Composable
-fun LoginScreen(onLoginClick: (String) -> Unit) {
+fun LoginScreen(
+    viewModel: LoginViewModel = hiltViewModel(),
+    onLoginClick: (Boolean) -> Unit,
+    onSignUpClick: () -> Unit,
+) {
     val emailState = remember { mutableStateOf(TextFieldValue("")) }
     val emailErrorState = remember { mutableStateOf(false) }
     val passwordState = remember { mutableStateOf(TextFieldValue("")) }
     val passwordErrorState = remember { mutableStateOf(false) }
-
+    val passwordVisible = remember { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
+
+    var loading by remember { mutableStateOf(false) }
+
+    val isSuccess by viewModel.isSignInSuccess.observeAsState(false)
+    val errorMsg by viewModel.errorMsg.observeAsState("")
+
+    LaunchedEffect(isSuccess) {
+        if (isSuccess) {
+            loading = false
+            showToast(context, "Signed In")
+            //  onLoginClick(true)
+        } else {
+            loading = false
+        }
+    }
+
+    LaunchedEffect(errorMsg) {
+        loading = false
+        if (errorMsg != "") {
+            showToast(context, errorMsg)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -39,6 +74,9 @@ fun LoginScreen(onLoginClick: (String) -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        if (loading) {
+            CircularProgressIndicator()
+        }
         OutlinedTextField(
             value = emailState.value,
             onValueChange = {
@@ -66,60 +104,77 @@ fun LoginScreen(onLoginClick: (String) -> Unit) {
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password
             ),
-            visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp),
-            isError = passwordErrorState.value
+            isError = passwordErrorState.value,
+            trailingIcon = {
+                IconButton(onClick = {
+                    passwordVisible.value = !passwordVisible.value
+                }) {
+                    Icon(
+                        painter = if (passwordVisible.value) painterResource(id = R.drawable.baseline_visibility_off_24)
+                        else painterResource(id = R.drawable.baseline_visibility_24),
+                        contentDescription = if (passwordVisible.value) "Hide password" else "Show password"
+                    )
+                }
+            }
         )
         Button(
             //Input verification for both email and password
             onClick = {
                 val email = emailState.value.text
                 val password = passwordState.value.text
+                val isVerified = loginFormVerification(context, email, password)
 
-              //  loginFormVerification(context, email, password)
-                // Pass login values to server after verification
-                focusManager.clearFocus()
-                onLoginClick(email)
-                showToast(context, "Login successful")
+                if (isVerified) {
+                    loading = true
+                    focusManager.clearFocus()
+
+                    val hash = hashPassword(password)
+                    viewModel.logInWithEmail(email, hash)
+                }
             }
         ) {
             Text("Login")
         }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Don't Have an Account?", Modifier.clickable {
+            onSignUpClick()
+        })
     }
 }
 
+//Toast Function
 fun showToast(context: Context, msg: String) =
     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
 
-fun loginFormVerification(context: Context, email: String, password: String) {
+//Text Validation for email and Password
+fun loginFormVerification(context: Context, email: String, password: String): Boolean {
     if (email.isBlank() || password.isBlank()) {
         showToast(context, "Please enter email and password")
-        return
+        return false
     }
-
     if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
         showToast(context, "Enter a valid email")
-        return
+        return false
     }
-
     if (password.length < 8) {
         showToast(context, "Password must contain at least 8 characters")
-        return
+        return false
     }
     if (!password.contains(Regex(CHECK_CAPITAL))) {
         showToast(context, "Password must contain at least one uppercase character")
-        return
+        return false
     }
-//    if (!password.contains(Regex(CHECK_SYMBOL_DIGIT))) {
-//        showToast(context, "Password must contain at least one symbol or digit")
-//        return
-//    }
+    return true
 }
 
 @Preview
 @Composable
 fun Preview() {
-    LoginScreen(onLoginClick = {})
+    LoginScreen(onLoginClick = {}) {}
 }
+
+

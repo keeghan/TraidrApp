@@ -13,11 +13,14 @@ import androidx.navigation.compose.rememberNavController
 import com.keeghan.traidr.BottomBarScreen
 import com.keeghan.traidr.navigation.MainNavGraph
 
-
+/**
+ * Main Screen composable, containing BottomNavigationBar
+ * And hosts the MainNavGraph with the Home, Post, Profile Screens
+ * */
 @Composable
 fun MainScreen(navController: NavHostController = rememberNavController()) {
     Scaffold(bottomBar = { BottomBar(navController = navController) }) {
-        MainNavGraph(it,navController)
+        MainNavGraph(it, navController)
     }
 }
 
@@ -56,7 +59,7 @@ fun RowScope.AddItem(
             Text(text = screen.title)
         },
         icon = {
-            val icon = if (currentDestination?.hierarchy?.any {
+            if (currentDestination?.hierarchy?.any {
                     it.route == screen.route
                 } == true) {
                 Icon(

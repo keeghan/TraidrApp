@@ -9,7 +9,12 @@ import com.keeghan.traidr.BottomBarScreen
 import com.keeghan.traidr.ui.screens.HomeScreen
 import com.keeghan.traidr.ui.screens.PostScreen
 import com.keeghan.traidr.ui.screens.ProfileScreen
+import com.keeghan.traidr.ui.screens.SettingsScreen
 
+
+/**
+ * Graph for bottomNavigation destinations and SettingsScreen
+ **/
 @Composable
 fun MainNavGraph(
     paddingValues: PaddingValues,
@@ -21,13 +26,17 @@ fun MainNavGraph(
         startDestination = BottomBarScreen.Home.route
     ) {
         composable(route = BottomBarScreen.Home.route) {
-            HomeScreen()
+            HomeScreen { navController.navigate(Graph.ORDER) }
         }
         composable(route = BottomBarScreen.Post.route) {
             PostScreen()
         }
         composable(route = BottomBarScreen.Profile.route) {
-            ProfileScreen()
+            ProfileScreen { navController.navigate(Graph.SETTINGS) }
         }
+        composable(route = Graph.SETTINGS) {
+            SettingsScreen()
+        }
+        orderNavGraph(navController = navController)
     }
 }

@@ -9,6 +9,7 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 
+//Class Representing the BottomNavigation destinations
 sealed class BottomBarScreen(
     val route: String,
     val title: String,
