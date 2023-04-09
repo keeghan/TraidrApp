@@ -4,20 +4,25 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.keeghan.traidr.models.user.User
+import androidx.lifecycle.viewModelScope
+import com.keeghan.traidr.models.user.UserResponse
 import com.keeghan.traidr.repository.UserRepository
+import com.keeghan.traidr.utils.Constants.Companion.USER_ID_DEFAULT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.Response
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    //  private val ioDispatcher: CoroutineDispatcher,
+    @Named("mainDispatcher") private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
-    private val _user = MutableLiveData<User>()
-    val user: LiveData<User> = _user
+    private val _user = MutableLiveData<UserResponse>()
+    val user: LiveData<UserResponse> = _user
 
     private val _isSignUpSuccess = MutableLiveData(false)
     val isSignUpSuccess: LiveData<Boolean> = _isSignUpSuccess
@@ -25,27 +30,41 @@ class SignUpViewModel @Inject constructor(
     private var _errorMsg = MutableLiveData<String>()
     var errorMsg: LiveData<String> = _errorMsg
 
-    suspend fun signUpWithEmail(email: String, password: String) {
-        try {
-            val response = userRepository.createUserWithEmail(email, password)
-            if (response.isSuccessful) {
-                //Assign New User
-                _user.value = response.body()
-                Log.d( "Auth-Token", response.headers()["Authorization"] ?: "null" )
-                _isSignUpSuccess.value = true
-            } else {
-                _errorMsg.value = logErrorMsg(response)!!
-                _isSignUpSuccess.value = false
+     var userId : Int = USER_ID_DEFAULT_KEY
+
+    fun signUpWithEmail(email: String, password: String) {
+        viewModelScope.launch(dispatcher) {
+            try {
+                val response = userRepository.createUserWithEmail(email, password)
+                if (response.isSuccessful) {
+                    //Assign New User
+                    _user.value = response.body()
+                    _isSignUpSuccess.postValue(true)
+                } else {
+                    var msg = logErrorMsg(response)!!
+                    if (msg.contains("has already")) {
+                        msg = "Account already Exists"
+                    }
+                    _errorMsg.postValue(msg)
+                    _isSignUpSuccess.postValue(false)
+                }
+            } catch (e: Exception) {
+                var msg = e.message.toString()
+                if (e.message.toString().contains("timeout")) {
+                    msg = "Sever timeout, please try again"
+                }
+                if (msg.contains("Unable to resolve host")) {
+                    msg = "Check Internet Connection"
+                }
+                _isSignUpSuccess.postValue(false)
+                _errorMsg.postValue(msg)
+                Log.d("NetworkException", "Caught $e")
             }
-        } catch (e: Exception) {
-            _isSignUpSuccess.value = false
-            _errorMsg.value = e.message.toString()
-            Log.d("NetworkException", "Caught $e")
         }
     }
 }
 
-fun logErrorMsg(response: Response<User>): String? {
+fun logErrorMsg(response: Response<UserResponse>): String? {
     val jsonObj = JSONObject(response.errorBody()!!.charStream().readText())
     val errorMessage = jsonObj.getJSONObject("errors")
         .getJSONArray("email")

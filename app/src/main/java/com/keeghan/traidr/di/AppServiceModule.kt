@@ -4,6 +4,7 @@ import android.preference.PreferenceManager
 import com.keeghan.traidr.network.TradirApi
 import com.keeghan.traidr.repository.UserRepository
 import com.keeghan.traidr.utils.Constants.Companion.BASE_URL
+import com.keeghan.traidr.utils.Constants.Companion.RETROFIT_TIMEOUT
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,9 +31,9 @@ object AppServiceModule {
 
         logging.setLevel(HttpLoggingInterceptor.Level.BODY)
         okHttpClient.addInterceptor(logging)
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
-            .writeTimeout(10, TimeUnit.SECONDS)
+            .connectTimeout(RETROFIT_TIMEOUT, TimeUnit.SECONDS)
+            .readTimeout(RETROFIT_TIMEOUT, TimeUnit.SECONDS)
+            .writeTimeout(RETROFIT_TIMEOUT, TimeUnit.SECONDS)
         return okHttpClient
     }
 
@@ -60,5 +61,8 @@ object AppServiceModule {
     @Named("ioDispatcher")
     fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
 
+    @Provides
+    @Named("defaultDispatcher")
+    fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
 
 }

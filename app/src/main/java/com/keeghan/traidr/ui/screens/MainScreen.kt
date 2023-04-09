@@ -1,5 +1,6 @@
 package com.keeghan.traidr.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -18,9 +19,14 @@ import com.keeghan.traidr.navigation.MainNavGraph
  * And hosts the MainNavGraph with the Home, Post, Profile Screens
  * */
 @Composable
-fun MainScreen(navController: NavHostController = rememberNavController()) {
-    Scaffold(bottomBar = { BottomBar(navController = navController) }) {
-        MainNavGraph(it, navController)
+fun MainScreen(
+    navController: NavHostController = rememberNavController(),
+    onSignOut: () -> Unit,
+) {
+    Scaffold(bottomBar = { BottomBar(navController) }) {
+        MainNavGraph(it, navController) {
+            onSignOut()
+        }
     }
 }
 
@@ -59,19 +65,16 @@ fun RowScope.AddItem(
             Text(text = screen.title)
         },
         icon = {
-            if (currentDestination?.hierarchy?.any {
-                    it.route == screen.route
-                } == true) {
-                Icon(
-                    imageVector = screen.icon_focused,
-                    contentDescription = "Navigation Icon"
-                )
-            } else {
-                Icon(
-                    imageVector = screen.icon,
-                    contentDescription = "Navigation Icon"
-                )
-            }
+            val icon =
+                if (currentDestination?.hierarchy?.any { it.route == screen.route } == true) {
+                    screen.icon_focused
+                } else {
+                    screen.icon
+                }
+            Icon(
+                imageVector = icon,
+                contentDescription = "Navigation Icon"
+            )
         },
         selected = currentDestination?.hierarchy?.any {
             it.route == screen.route

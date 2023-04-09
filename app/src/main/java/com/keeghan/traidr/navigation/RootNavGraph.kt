@@ -2,25 +2,38 @@ package com.keeghan.traidr.navigation
 
 import android.provider.DocumentsContract.Root
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.keeghan.traidr.navigation.AuthScreen.*
 import com.keeghan.traidr.ui.screens.MainScreen
+import com.keeghan.traidr.utils.Auth
 
 /**
  * Main Graph, containing AuthGraph, and MainScreen with BottomNavigationBar
-* */
+ * */
 @Composable
 fun RootNavGraph(navController: NavHostController) {
+    val context = LocalContext.current
+    val auth = Auth(context) //Manage Login and SignOuts
+
     NavHost(
         navController = navController,
         route = Graph.ROOT,
-        startDestination = Graph.AUTHENTICATION
+        //Send to main Screen if logged In
+        startDestination = if (auth.isLoggedIn()) Graph.MAIN else Graph.AUTHENTICATION
     ) {
         authNavGraph(navController = navController)
+
+        //Hoist SignOut up to it gets to root
         composable(route = Graph.MAIN) {
-            MainScreen()
+            MainScreen(onSignOut = {
+                navController.navigate(Graph.AUTHENTICATION) {
+                    popUpTo(Graph.MAIN) { inclusive = true }
+                }
+            })
         }
     }
 }

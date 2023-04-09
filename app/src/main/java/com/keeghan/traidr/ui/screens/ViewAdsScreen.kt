@@ -10,7 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun ViewAdsScreen() {
+fun ViewAdsScreen(
+    categoryId: Int,
+) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -18,6 +20,6 @@ fun ViewAdsScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "View Ads")
+        Text(text = categoryId.toString())
     }
 }

@@ -20,7 +20,7 @@ fun NavGraphBuilder.authNavGraph(navController: NavController) {
     ) {
         composable(route = Login.route) {
             LoginScreen(onLoginClick = {
-                if (it){
+                if (it) {
                     navController.navigate(Graph.MAIN) {
                         popUpTo(Login.route) { inclusive = true }
                     }
@@ -33,10 +33,12 @@ fun NavGraphBuilder.authNavGraph(navController: NavController) {
         composable(route = SignUp.route) {
             SignUpScreen(
                 onSignUpClick = {
-                    navController.navigate(Graph.MAIN)
+                    navController.navigate(Login.route) {
+                        popUpTo(SignUp.route) { inclusive = true }
+                    }
                 },
                 onLoginClick = {
-                    navController.navigate(Login.route)  {
+                    navController.navigate(Login.route) {
                         popUpTo(SignUp.route) { inclusive = true }
                     }
                 }

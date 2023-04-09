@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -19,18 +20,18 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.keeghan.traidr.R
 import com.keeghan.traidr.utils.Constants.Companion.CHECK_CAPITAL
+import com.keeghan.traidr.utils.Constants.Companion.NETWORK_TIMEOUT
 import com.keeghan.traidr.utils.hashPassword
 import com.keeghan.traidr.viewmodels.SignUpViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
-const val TAG: String = "SIGNINTAG"
-
+//Todo: Repeated Error message trigger on  signin and signUp
 @Composable
 fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel(),
-    onSignUpClick: (String) -> Unit,
-    onLoginClick: () -> Unit,
+    onSignUpClick: (Boolean) -> Unit,
+    onLoginClick: () -> Unit,    //User without account
 ) {
     val emailState = remember { mutableStateOf(TextFieldValue("")) }
     val emailErrorState = remember { mutableStateOf(false) }
@@ -44,14 +45,34 @@ fun SignUpScreen(
 
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
 
     var loading by remember { mutableStateOf(false) }
 
-//    val errorMsg = viewModel.errorMsg.observeAsState()
-//    val isSignUpSuccess = viewModel.isSignUpSuccess.observeAsState()
+    val errorMsg by viewModel.errorMsg.observeAsState("")
+    val isSignUpSuccess by viewModel.isSignUpSuccess.observeAsState(false)
 //    val user = viewModel.user.observeAsState()
+    val coroutineScope = rememberCoroutineScope()
+    var errorMsgShown by remember { mutableStateOf(false) }
 
+
+
+    LaunchedEffect(isSignUpSuccess) {
+        if (isSignUpSuccess) {
+            loading = false
+            showToast(context, "Account Created")
+            onSignUpClick(true)
+        } else {
+            loading = false
+        }
+    }
+
+    LaunchedEffect(errorMsg) {
+        loading = false
+        errorMsgShown = true //change errorMsgState once shown
+        if (errorMsg != "") {
+            showToast(context, errorMsg)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -152,30 +173,20 @@ fun SignUpScreen(
                     password = password,
                     confirmPassword = confirmPassword
                 )
+
                 if (isVerified) {
+                    errorMsgShown = false //everytime button is clicked errorMsgState reset
                     loading = true
                     focusManager.clearFocus()
+                    val hash = hashPassword(password)
+                    viewModel.signUpWithEmail(email, hash)
+                    //Wait ten seconds to reshow errorMsg (will not trigger on it own if its the same)
                     coroutineScope.launch {
-                        val hash = hashPassword(password)
-                        viewModel.signUpWithEmail(email, hash)
-                        if (viewModel.isSignUpSuccess.value == true) {
-                            //signIn Successful
+                        delay(NETWORK_TIMEOUT)
+                        if (!errorMsgShown) { //if errorMsg is not shown , show it again
+                            showToast(context, errorMsg)
                             loading = false
-                            val username =
-                                viewModel.user.value?.data?.attributes!!.email.substringBefore("@")
-                            showToast(context, "Welcome, $username")
-                        } else {
-                            loading = false
-                            viewModel.errorMsg.value.let {
-                                if (it != null) {
-                                    if (it.contains("has already")) {
-                                        showToast(context, "Account already Exits")
-                                    }
-                                    if (it.contains("timeout")) {
-                                        showToast(context, "Sever timeout, please try again")
-                                    }
-                                }
-                            }
+                            //errorMsgShown = true
                         }
                     }
                 } //end of ifVerified

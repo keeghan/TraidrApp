@@ -46,6 +46,14 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+
+    testOptions {
+        unitTests {
+            // Enable unit testing with the AndroidJUnitRunner.
+            includeAndroidResources = true
+        }
+    }
+
 }
 dependencies {
     def nav_version = "2.5.3"
@@ -87,7 +95,7 @@ dependencies {
 
     //Android Navigation
     implementation("androidx.navigation:navigation-compose:$nav_version")
-    implementation "androidx.compose.material:material-icons-core:1.4.0"
+    implementation "androidx.compose.material:material-icons-core:1.4.1"
 
     androidTestImplementation 'androidx.test:runner:1.5.2'
     testImplementation 'junit:junit:4.13.2'
@@ -105,12 +113,16 @@ dependencies {
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
 
     //Hilt Tests
-    kaptTest("com.google.dagger:hilt-android-compiler:2.44")
-    testAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.44")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
-    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
-    androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.44")
+    kaptTest("com.google.dagger:hilt-android-compiler:$hilt_version")
+    testAnnotationProcessor("com.google.dagger:hilt-android-compiler:$hilt_version")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:$hilt_version")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:$hilt_version")
+    androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:$hilt_version")
 
+
+    testImplementation 'org.mockito.kotlin:mockito-kotlin:4.0.0'
+    //For runBlockingTest, CoroutineDispatcher etc.
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
 }
 
 kapt {

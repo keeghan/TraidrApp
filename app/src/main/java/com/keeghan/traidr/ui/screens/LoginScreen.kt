@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -21,20 +20,21 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.MutableLiveData
 import com.keeghan.traidr.R
+import com.keeghan.traidr.utils.Auth
 import com.keeghan.traidr.utils.Constants.Companion.CHECK_CAPITAL
-import com.keeghan.traidr.utils.Constants.Companion.CHECK_SYMBOL_DIGIT
+import com.keeghan.traidr.utils.Constants.Companion.NETWORK_TIMEOUT
 import com.keeghan.traidr.utils.hashPassword
 import com.keeghan.traidr.viewmodels.LoginViewModel
-import com.keeghan.traidr.viewmodels.SignUpViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
     onLoginClick: (Boolean) -> Unit,
-    onSignUpClick: () -> Unit,
+    onSignUpClick: () -> Unit,  //User without account
 ) {
     val emailState = remember { mutableStateOf(TextFieldValue("")) }
     val emailErrorState = remember { mutableStateOf(false) }
@@ -44,17 +44,26 @@ fun LoginScreen(
 
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     var loading by remember { mutableStateOf(false) }
 
     val isSuccess by viewModel.isSignInSuccess.observeAsState(false)
     val errorMsg by viewModel.errorMsg.observeAsState("")
+    var errorMsgShown by remember { mutableStateOf(false) }
 
+
+    val auth = Auth(context)
+
+    //On successful login, Store values in Preference using auth
     LaunchedEffect(isSuccess) {
         if (isSuccess) {
             loading = false
             showToast(context, "Signed In")
-            //  onLoginClick(true)
+            auth.saveAuthToken(viewModel.token.value.toString())
+            auth.saveUserId(viewModel.userId.value!!)
+            auth.logIn()
+            onLoginClick(true)
         } else {
             loading = false
         }
@@ -62,8 +71,11 @@ fun LoginScreen(
 
     LaunchedEffect(errorMsg) {
         loading = false
-        if (errorMsg != "") {
-            showToast(context, errorMsg)
+        if (errorMsg.isNotEmpty()) {
+            if (errorMsg != "") {
+                showToast(context, errorMsg)
+                errorMsgShown = true
+            }
         }
     }
 
@@ -124,6 +136,7 @@ fun LoginScreen(
         Button(
             //Input verification for both email and password
             onClick = {
+                errorMsgShown = false
                 val email = emailState.value.text
                 val password = passwordState.value.text
                 val isVerified = loginFormVerification(context, email, password)
@@ -134,6 +147,14 @@ fun LoginScreen(
 
                     val hash = hashPassword(password)
                     viewModel.logInWithEmail(email, hash)
+                    coroutineScope.launch {
+                        delay(NETWORK_TIMEOUT)
+                        if (!errorMsgShown) { //if errorMsg is not shown , show it again
+                            showToast(context, errorMsg)
+                            loading = false
+                            errorMsgShown = true
+                        }
+                    }
                 }
             }
         ) {
