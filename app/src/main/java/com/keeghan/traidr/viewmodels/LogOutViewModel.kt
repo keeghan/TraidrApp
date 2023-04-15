@@ -1,6 +1,5 @@
 package com.keeghan.traidr.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,35 +16,30 @@ class LogOutViewModel @Inject constructor(
     private val userRepository: UserRepository,
     @Named("ioDispatcher") private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
-    private var _isSignOutSuccess: MutableLiveData<Boolean> = MutableLiveData(false)
-    var isSignOutSuccess: LiveData<Boolean> = _isSignOutSuccess
+    private var _signOutState: MutableLiveData<Boolean> = MutableLiveData(false)
+    var signOutState: LiveData<Boolean> = _signOutState
 
     private var _errorMsg: MutableLiveData<String> = MutableLiveData()
     var errorMsg: LiveData<String> = _errorMsg
 
-    private var _successMsg: MutableLiveData<String> = MutableLiveData()
-    var successMsg: LiveData<String> = _successMsg
-
-
     fun signOut(token: String, Id: Int) {
+        _errorMsg.value = ""
         viewModelScope.launch(dispatcher) {
             try {
                 val response = userRepository.signOut(token, Id)
                 if (response.isSuccessful) {
-                    val logoutResponse = response.body()
-                    _successMsg.postValue(logoutResponse!!.message)
-                    _isSignOutSuccess.postValue(true)
-                    Log.d("Success", response.body().toString())
+                    _signOutState.postValue(true)
                 } else {
-                    var msg = response.message()
-                    _errorMsg.postValue(msg)
-                    _isSignOutSuccess.postValue(false)
+                    _errorMsg.postValue(response.message())
+                    _signOutState.postValue(false)
                 }
             } catch (e: Exception) {
                 val msg = e.message.toString()
-                _isSignOutSuccess.postValue(false)
                 _errorMsg.postValue(msg)
-                Log.d("NetworkException", "Caught $e")
+                if (msg.contains("timeout")) {
+                    _errorMsg.postValue("Server timeout, try Again")
+                }
+                _signOutState.postValue(false)
             }
         }
     }

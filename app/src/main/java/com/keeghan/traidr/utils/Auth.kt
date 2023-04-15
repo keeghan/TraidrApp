@@ -22,7 +22,7 @@ class Auth @Inject constructor(@ApplicationContext private val context: Context)
         return prefs.getBoolean(SIGNIN_KEY, false)
     }
 
-    fun logIn() {
+    private fun setSetSignInKeyToTrue() {
         prefs.edit().putBoolean(SIGNIN_KEY, true).apply()
     }
 
@@ -32,7 +32,7 @@ class Auth @Inject constructor(@ApplicationContext private val context: Context)
     }
 
 
-    fun saveAuthToken(authToken: String) {
+    private fun saveAuthToken(authToken: String) {
         prefs.edit().putString(AUTH_TOKEN_KEY, authToken).apply()
     }
 
@@ -41,11 +41,17 @@ class Auth @Inject constructor(@ApplicationContext private val context: Context)
         return prefs.getString(AUTH_TOKEN_KEY, AUTH_DEFAULT_TOKEN_KEY)
     }
 
-    fun saveUserId(userId: Int) {
+    private fun saveUserId(userId: Int) {
         prefs.edit().putInt(USER_ID_KEY, userId).apply()
     }
 
     fun getUserId(): Int {
         return prefs.getInt(USER_ID_KEY, USER_ID_DEFAULT_KEY)
+    }
+
+    fun logIn(authToken: String,userId: Int){
+        saveUserId(userId)
+        saveAuthToken(authToken)
+        setSetSignInKeyToTrue()
     }
 }

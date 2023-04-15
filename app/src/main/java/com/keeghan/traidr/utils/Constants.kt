@@ -22,6 +22,10 @@ class Constants {
         const val NETWORK_TIMEOUT: Long = 11000
         const val RETROFIT_TIMEOUT: Long = 11
 
+        //Settings
+        const val SETTINGS_PREFERENCE = "settingsPreference"
+        const val DARK_THEME_KEY = "dark_theme_enabled"
+
 
     }
 }

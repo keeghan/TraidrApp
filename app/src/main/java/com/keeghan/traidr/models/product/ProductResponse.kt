@@ -1,4 +1,4 @@
-package com.keeghan.traidr.models
+package com.keeghan.traidr.models.product
 
 import java.math.BigDecimal
 

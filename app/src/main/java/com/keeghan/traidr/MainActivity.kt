@@ -6,10 +6,13 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
 import com.keeghan.traidr.navigation.RootNavGraph
 import com.keeghan.traidr.ui.theme.TraidrTheme
+import com.keeghan.traidr.utils.SettingsPreferenceManager
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -17,15 +20,19 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
-            TraidrTheme {
+            TraidrTheme(
+            ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     // Storing data into SharedPreferences
                     //  SignUpScreen(this, onSignUpClick = {})
-                    RootNavGraph(navController = rememberNavController())
+                    RootNavGraph(
+                        navController = rememberNavController()
+                    )
                 }
             }
         }

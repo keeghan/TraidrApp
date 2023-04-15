@@ -50,9 +50,6 @@ fun SignUpScreen(
 
     val errorMsg by viewModel.errorMsg.observeAsState("")
     val isSignUpSuccess by viewModel.isSignUpSuccess.observeAsState(false)
-//    val user = viewModel.user.observeAsState()
-    val coroutineScope = rememberCoroutineScope()
-    var errorMsgShown by remember { mutableStateOf(false) }
 
 
 
@@ -67,10 +64,11 @@ fun SignUpScreen(
     }
 
     LaunchedEffect(errorMsg) {
-        loading = false
-        errorMsgShown = true //change errorMsgState once shown
-        if (errorMsg != "") {
-            showToast(context, errorMsg)
+        if (errorMsg.isNotEmpty()) {
+            if (errorMsg != "") {
+                loading = false
+                showToast(context, errorMsg)
+            }
         }
     }
 
@@ -80,9 +78,11 @@ fun SignUpScreen(
             .padding(16.dp)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+
     ) {
         if (loading) {
-            CircularProgressIndicator()
+            CircularProgressIndicator() //indicate progress
         }
         //email
         OutlinedTextField(
@@ -175,20 +175,10 @@ fun SignUpScreen(
                 )
 
                 if (isVerified) {
-                    errorMsgShown = false //everytime button is clicked errorMsgState reset
-                    loading = true
+                    loading = true   //Spinning Icon state
                     focusManager.clearFocus()
                     val hash = hashPassword(password)
                     viewModel.signUpWithEmail(email, hash)
-                    //Wait ten seconds to reshow errorMsg (will not trigger on it own if its the same)
-                    coroutineScope.launch {
-                        delay(NETWORK_TIMEOUT)
-                        if (!errorMsgShown) { //if errorMsg is not shown , show it again
-                            showToast(context, errorMsg)
-                            loading = false
-                            //errorMsgShown = true
-                        }
-                    }
                 } //end of ifVerified
             }
         ) {

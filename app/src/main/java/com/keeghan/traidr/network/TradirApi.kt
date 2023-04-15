@@ -1,6 +1,9 @@
 package com.keeghan.traidr.network
 
-import com.keeghan.traidr.models.ProductResponse
+import com.keeghan.traidr.models.product.ProductReqRes
+import com.keeghan.traidr.models.product.ProductReq
+import com.keeghan.traidr.models.product.ProductResponse
+import com.keeghan.traidr.models.product.ProductsResponse
 import com.keeghan.traidr.models.user.NewUser
 import com.keeghan.traidr.models.user.UserResponse
 import com.keeghan.traidr.models.user.loginUser.UserCredentials
@@ -24,8 +27,16 @@ interface TradirApi {
         @Path("id") userId: Int,
     ): Response<LogoutResponse>
 
-
     //Product
     @GET("products/{id}")
-    suspend fun getProduct(@Path("id") productId: Int) : Response<ProductResponse>
+    suspend fun getProduct(@Path("id") productId: Int): Response<ProductResponse>
+
+    @GET("products")
+    suspend fun getAllProduct(): Response<ProductsResponse>
+
+    @POST("products")
+    suspend fun createProduct(
+        @Header("Authorization") token: String,
+        @Body productRequest: ProductReq,
+    ): Response<ProductReqRes>
 }

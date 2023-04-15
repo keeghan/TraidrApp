@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.keeghan.traidr.models.user.UserResponse
 import com.keeghan.traidr.repository.UserRepository
-import com.keeghan.traidr.utils.Constants.Companion.USER_ID_DEFAULT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -22,17 +21,17 @@ class SignUpViewModel @Inject constructor(
     @Named("mainDispatcher") private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val _user = MutableLiveData<UserResponse>()
-    val user: LiveData<UserResponse> = _user
+    //val user: LiveData<UserResponse> = _user
 
     private val _isSignUpSuccess = MutableLiveData(false)
     val isSignUpSuccess: LiveData<Boolean> = _isSignUpSuccess
 
-    private var _errorMsg = MutableLiveData<String>()
+    private var _errorMsg = MutableLiveData("")
     var errorMsg: LiveData<String> = _errorMsg
 
-     var userId : Int = USER_ID_DEFAULT_KEY
 
     fun signUpWithEmail(email: String, password: String) {
+        _errorMsg.postValue("")
         viewModelScope.launch(dispatcher) {
             try {
                 val response = userRepository.createUserWithEmail(email, password)
@@ -49,12 +48,10 @@ class SignUpViewModel @Inject constructor(
                     _isSignUpSuccess.postValue(false)
                 }
             } catch (e: Exception) {
-                var msg = e.message.toString()
-                if (e.message.toString().contains("timeout")) {
-                    msg = "Sever timeout, please try again"
-                }
-                if (msg.contains("Unable to resolve host")) {
-                    msg = "Check Internet Connection"
+                val msg = when {
+                    e.message!!.contains("timeout") -> "Server timeout, please try again"
+                    e.message!!.contains("Unable to resolve host") -> "Check Internet Connection"
+                    else -> e.message.toString()
                 }
                 _isSignUpSuccess.postValue(false)
                 _errorMsg.postValue(msg)

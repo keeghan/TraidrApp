@@ -23,11 +23,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.keeghan.traidr.R
 import com.keeghan.traidr.utils.Auth
 import com.keeghan.traidr.utils.Constants.Companion.CHECK_CAPITAL
-import com.keeghan.traidr.utils.Constants.Companion.NETWORK_TIMEOUT
 import com.keeghan.traidr.utils.hashPassword
 import com.keeghan.traidr.viewmodels.LoginViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -44,14 +41,11 @@ fun LoginScreen(
 
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
 
     var loading by remember { mutableStateOf(false) }
 
     val isSuccess by viewModel.isSignInSuccess.observeAsState(false)
     val errorMsg by viewModel.errorMsg.observeAsState("")
-    var errorMsgShown by remember { mutableStateOf(false) }
-
 
     val auth = Auth(context)
 
@@ -59,10 +53,9 @@ fun LoginScreen(
     LaunchedEffect(isSuccess) {
         if (isSuccess) {
             loading = false
-            showToast(context, "Signed In")
-            auth.saveAuthToken(viewModel.token.value.toString())
-            auth.saveUserId(viewModel.userId.value!!)
-            auth.logIn()
+            val token = viewModel.userCred.value!!.token
+            val userId = viewModel.userCred.value!!.id
+            auth.logIn(token, userId)
             onLoginClick(true)
         } else {
             loading = false
@@ -70,11 +63,10 @@ fun LoginScreen(
     }
 
     LaunchedEffect(errorMsg) {
-        loading = false
         if (errorMsg.isNotEmpty()) {
             if (errorMsg != "") {
                 showToast(context, errorMsg)
-                errorMsgShown = true
+                loading = false
             }
         }
     }
@@ -136,7 +128,6 @@ fun LoginScreen(
         Button(
             //Input verification for both email and password
             onClick = {
-                errorMsgShown = false
                 val email = emailState.value.text
                 val password = passwordState.value.text
                 val isVerified = loginFormVerification(context, email, password)
@@ -147,14 +138,6 @@ fun LoginScreen(
 
                     val hash = hashPassword(password)
                     viewModel.logInWithEmail(email, hash)
-                    coroutineScope.launch {
-                        delay(NETWORK_TIMEOUT)
-                        if (!errorMsgShown) { //if errorMsg is not shown , show it again
-                            showToast(context, errorMsg)
-                            loading = false
-                            errorMsgShown = true
-                        }
-                    }
                 }
             }
         ) {

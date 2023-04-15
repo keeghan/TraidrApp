@@ -15,7 +15,9 @@ import com.keeghan.traidr.utils.Auth
  * Main Graph, containing AuthGraph, and MainScreen with BottomNavigationBar
  * */
 @Composable
-fun RootNavGraph(navController: NavHostController) {
+fun RootNavGraph(
+    navController: NavHostController,
+) {
     val context = LocalContext.current
     val auth = Auth(context) //Manage Login and SignOuts
 

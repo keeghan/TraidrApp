@@ -1,10 +1,14 @@
 package com.keeghan.traidr.ui.screens
 
+import android.app.Activity
 import android.util.Log
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -23,6 +27,20 @@ fun MainScreen(
     navController: NavHostController = rememberNavController(),
     onSignOut: () -> Unit,
 ) {
+    //Kill activity when back is pressed (Quick Theme Change)
+    val backPressedCallback = object : OnBackPressedCallback(true) {
+        val context = LocalContext.current
+        override fun handleOnBackPressed() {
+            // Kill the app when the back button is pressed
+            (context as? Activity)?.finishAffinity()
+
+        }
+    }
+    // Add the OnBackPressedCallback to the back press dispatcher
+    LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher?.addCallback(
+        backPressedCallback
+    )
+
     Scaffold(bottomBar = { BottomBar(navController) }) {
         MainNavGraph(it, navController) {
             onSignOut()
@@ -91,3 +109,4 @@ fun RowScope.AddItem(
         }
     )
 }
+

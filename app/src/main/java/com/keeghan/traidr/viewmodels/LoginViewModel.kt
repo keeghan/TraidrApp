@@ -2,6 +2,7 @@ package com.keeghan.traidr.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.*
+import com.keeghan.traidr.models.user.loginUser.UserCredentials
 import com.keeghan.traidr.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -14,11 +15,8 @@ class LoginViewModel @Inject constructor(
     private val userRepository: UserRepository,
     @Named("mainDispatcher") private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
-    private var _token: MutableLiveData<String> = MutableLiveData()
-    var token: LiveData<String> = _token
-
-    private var _userId: MutableLiveData<Int> = MutableLiveData()
-    var userId: MutableLiveData<Int> = _userId
+    private var _userCred: MutableLiveData<UserCredentials> = MutableLiveData()
+    var userCred: LiveData<UserCredentials> = _userCred
 
     private val _isSignInSuccess = MutableLiveData(false)
     val isSignInSuccess: LiveData<Boolean> = _isSignInSuccess
@@ -27,37 +25,33 @@ class LoginViewModel @Inject constructor(
     var errorMsg: LiveData<String> = _errorMsg
 
     fun logInWithEmail(email: String, password: String) {
+        _errorMsg.postValue("")   //reset msg in case error appear in succession
         viewModelScope.launch(dispatcher) {
             try {
                 val response = userRepository.loginWithEmail(email, password)
                 if (response.isSuccessful) {
-                    val userCred = response.body()
-                    _token.value = userCred!!.token
-                    _userId.value = userCred.id
+                    _userCred.value = response.body()
                     _isSignInSuccess.postValue(true)
-                    Log.d("Auth-Token", userCred.token)
+                    Log.d("Auth-Token", _userCred.value!!.token)
                 } else {
-                    _errorMsg.postValue(response.code().toString())
-                    if (response.code() == 401) {
-                        _errorMsg.postValue("Check email or Password")
+                    val errorMsg = when (response.code()) {
+                        401 -> "Check email or Password"
+                        else -> response.code().toString()
                     }
+                    _errorMsg.postValue(errorMsg)
                     _isSignInSuccess.postValue(false)
                 }
             } catch (e: Exception) {
+                val msg = when {
+                    e.message!!.contains("timeout") -> "Server timeout, please try again"
+                    e.message!!.contains("Unable to resolve host") -> "Check Internet Connection"
+                    else -> e.message.toString()
+                }
+                _errorMsg.postValue(msg)
                 _isSignInSuccess.postValue(false)
-                _errorMsg.postValue(e.message.toString())
+
                 Log.d("NetworkException", "Caught $e")
             }
         }
     }
 }
-
-//fun logErrorMsg1(_userCred: Response<UserCredentials>): String? {
-//    val jsonObj = JSONObject(_userCred.errorBody()!!.charStream().readText())
-//    val errorMessage = jsonObj.getJSONObject("errors")
-//        .getJSONArray("email")
-//        .getString(0)
-//    Log.d("Error-Body", errorMessage)
-//    Log.d("Error-Code", _userCred.code().toString())
-//    return errorMessage
-//}
