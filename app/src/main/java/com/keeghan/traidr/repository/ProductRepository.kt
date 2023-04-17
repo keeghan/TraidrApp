@@ -16,13 +16,19 @@ class ProductRepository @Inject constructor(private val api: TradirApi) {
         return api.getProduct(productId)
     }
 
-    suspend fun getAllProduct(): Response<ProductsResponse> {
-        return api.getAllProduct()
+//    suspend fun getAllProduct(): Response<ProductsResponse> {
+//        return api.getAllProduct()
+//    }
+
+    suspend fun getAllProduct(url: String): Response<ProductsResponse> {
+        return api.getAllProduct(url)
     }
 
-    suspend fun createProduct(token: String, productReq: ProductReq,
+    suspend fun createProduct(
+        token: String, productReq: ProductReq,
     ): Response<ProductReqRes> {
         return api.createProduct(token, productReq)
     }
+
 
 }

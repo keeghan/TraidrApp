@@ -19,42 +19,43 @@ class ProductsViewModel @Inject constructor(
     @Named("ioDispatcher") private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
-    private var _isLoading = MutableLiveData<Boolean>()
+    private var _isLoading = MutableLiveData<Boolean>(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
     private var _errorMsg: MutableLiveData<String> = MutableLiveData()
     var errorMsg: LiveData<String> = _errorMsg
 
-    var allProductsRes: MutableLiveData<ProductsResponse> = MutableLiveData()
-
-    // var allProducts: LiveData<List<Product>> = _allProducts.value?.data!!
-    var allProducts: MutableLiveData<List<Product>> = MutableLiveData()
+    private var _allProductsRes: MutableLiveData<ProductsResponse> = MutableLiveData()
+    var allProductsRes: LiveData<ProductsResponse> = _allProductsRes
 
 
-    fun getAllProduct() {
+
+    fun getAllProducts(url: String = "products") {
+        _isLoading.postValue(true)
+        _errorMsg.value = ""
+
         viewModelScope.launch(dispatcher) {
             try {
-                _isLoading.postValue(true)
-                val response = repository.getAllProduct()
+                _isLoading.postValue(false)
+                val response = repository.getAllProduct(url)
                 if (response.isSuccessful) {
-                    allProductsRes.postValue(response.body())
-                    allProducts.postValue(allProductsRes.value?.data!!)
-                    _isLoading.postValue(false)
-
+                    _allProductsRes.postValue(response.body())
                 } else {
-                    var msg = response.message()
-                    var code = response.code()
+                    val msg = response.message()
+                    val code = response.code()
+                    _errorMsg.postValue(code.toString())
                     _isLoading.postValue(false)
                 }
             } catch (e: Exception) {
                 _isLoading.postValue(false)
-                val msg = e.message.toString()
-                _errorMsg.postValue(msg)
-                if (e.message.toString().contains("timeout")) {
-                    _errorMsg.postValue("Sever timeout, please try again")
-                }
-                if (msg.contains("Unable to resolve host")) {
-                    _errorMsg.postValue("Check Internet Connection")
+                e.message?.let { msg ->
+                    _errorMsg.postValue(msg)
+                    if (msg.contains("timeout")) {
+                        _errorMsg.postValue("Server timeout,reload")
+                    }
+                    if (msg.contains("Unable to resolve")) {
+                        _errorMsg.postValue("Check Internet Connection")
+                    }
                 }
             }
         }

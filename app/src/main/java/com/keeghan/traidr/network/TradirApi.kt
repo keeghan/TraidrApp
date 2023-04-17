@@ -31,12 +31,18 @@ interface TradirApi {
     @GET("products/{id}")
     suspend fun getProduct(@Path("id") productId: Int): Response<ProductResponse>
 
-    @GET("products")
-    suspend fun getAllProduct(): Response<ProductsResponse>
+//    @GET("products")
+//    suspend fun getAllProduct(): Response<ProductsResponse>
+
+    @GET //uses url
+    suspend fun getAllProduct(@Url url: String): Response<ProductsResponse>
 
     @POST("products")
     suspend fun createProduct(
         @Header("Authorization") token: String,
         @Body productRequest: ProductReq,
     ): Response<ProductReqRes>
+
+
+
 }

@@ -26,7 +26,6 @@ import com.keeghan.traidr.viewmodels.SignUpViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-//Todo: Repeated Error message trigger on  signin and signUp
 @Composable
 fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel(),

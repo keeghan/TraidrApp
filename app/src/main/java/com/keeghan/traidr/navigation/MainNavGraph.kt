@@ -29,7 +29,7 @@ fun MainNavGraph(
         startDestination = BottomBarScreen.Home.route
     ) {
         composable(route = BottomBarScreen.Home.route) {
-            HomeScreen() { categoryId ->
+            HomeScreen(paddingValues) { categoryId ->
                 navController.navigate("${ViewAds.route}/$categoryId")  //Reference nested destination directly
             }
         }

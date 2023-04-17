@@ -13,7 +13,6 @@ import javax.inject.Singleton
 @Singleton
 class UserRepository @Inject constructor(private val api: TradirApi) {
 
-    //todo
     suspend fun createUserWithEmail(email: String, password: String): Response<UserResponse> {
         return api.signUpWithEmail(NewUser(User(email, password)))
     }

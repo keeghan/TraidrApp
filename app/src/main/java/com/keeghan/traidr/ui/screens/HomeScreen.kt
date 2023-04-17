@@ -1,10 +1,7 @@
 package com.keeghan.traidr.ui.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -19,12 +16,14 @@ import com.keeghan.traidr.ui.composables.CategoryCard
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
+    paddingValues: PaddingValues,
     onCategoryClick: (Int) -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(paddingValues),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

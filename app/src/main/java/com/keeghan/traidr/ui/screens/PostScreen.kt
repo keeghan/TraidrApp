@@ -15,7 +15,9 @@ import com.keeghan.traidr.models.product.ProductReq
 import com.keeghan.traidr.utils.Auth
 import com.keeghan.traidr.viewmodels.CreateProductViewModel
 import com.keeghan.traidr.viewmodels.ProductsViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 @Composable
 fun PostScreen(

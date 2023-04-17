@@ -9,6 +9,7 @@ import com.keeghan.traidr.models.product.ProductReq
 import com.keeghan.traidr.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
