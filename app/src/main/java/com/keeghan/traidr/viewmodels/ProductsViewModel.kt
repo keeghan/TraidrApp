@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.keeghan.traidr.models.product.Product
 import com.keeghan.traidr.models.product.ProductsResponse
 import com.keeghan.traidr.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +18,7 @@ class ProductsViewModel @Inject constructor(
     @Named("ioDispatcher") private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
-    private var _isLoading = MutableLiveData<Boolean>(false)
+    private var _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
     private var _errorMsg: MutableLiveData<String> = MutableLiveData()
@@ -29,35 +28,29 @@ class ProductsViewModel @Inject constructor(
     var allProductsRes: LiveData<ProductsResponse> = _allProductsRes
 
 
-
     fun getAllProducts(url: String = "products") {
         _isLoading.postValue(true)
-        _errorMsg.value = ""
-
+        _errorMsg.postValue("")
         viewModelScope.launch(dispatcher) {
             try {
-                _isLoading.postValue(false)
                 val response = repository.getAllProduct(url)
                 if (response.isSuccessful) {
                     _allProductsRes.postValue(response.body())
                 } else {
-                    val msg = response.message()
-                    val code = response.code()
-                    _errorMsg.postValue(code.toString())
-                    _isLoading.postValue(false)
+                    _errorMsg.postValue(response.code().toString())
                 }
             } catch (e: Exception) {
-                _isLoading.postValue(false)
                 e.message?.let { msg ->
                     _errorMsg.postValue(msg)
-                    if (msg.contains("timeout")) {
-                        _errorMsg.postValue("Server timeout,reload")
-                    }
-                    if (msg.contains("Unable to resolve")) {
-                        _errorMsg.postValue("Check Internet Connection")
+                    when {
+                        msg.contains("timeout") -> _errorMsg.postValue("Server timeout, please reload")
+                        msg.contains("Unable to resolve") -> _errorMsg.postValue("Check internet connection")
                     }
                 }
+            } finally {
+                _isLoading.postValue(false)
             }
         }
     }
+
 }

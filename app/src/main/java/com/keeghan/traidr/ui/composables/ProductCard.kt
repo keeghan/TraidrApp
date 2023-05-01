@@ -34,12 +34,10 @@ fun ProductCard(
     title: String,
 ) {
     Card(
-       // shape = RoundedCornerShape(6.dp),
+        // shape = RoundedCornerShape(6.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = Modifier
-            .clickable {
-                onCardClick(productId)
-            }
+            .clickable { onCardClick(productId) }
             .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(6.dp))
     ) {
         Column(
@@ -55,7 +53,7 @@ fun ProductCard(
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 250.dp)
+                    .heightIn(max = 220.dp)
             )
             Column(Modifier.padding(start = 5.dp)) {
                 Text(
