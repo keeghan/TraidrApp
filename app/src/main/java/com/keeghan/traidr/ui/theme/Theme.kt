@@ -81,7 +81,6 @@ private val DarkColorScheme = darkColorScheme(
 @Composable
 fun TraidrTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit,
 ) {
@@ -91,9 +90,6 @@ fun TraidrTheme(
     val isDarkThemeEnabled = settingsPref.isDarkTheme()
 
     val colorScheme = when {
-//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-//            if (isDarkThemeEnabled) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-//        }
         isDarkThemeEnabled -> DarkColorScheme
         else -> LightColorScheme
     }

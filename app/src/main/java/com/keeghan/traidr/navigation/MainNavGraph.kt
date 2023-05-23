@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import com.keeghan.traidr.BottomBarScreen
 import com.keeghan.traidr.navigation.OrderScreen.ViewAds
 import com.keeghan.traidr.ui.screens.HomeScreen
+import com.keeghan.traidr.ui.screens.MyAdsScreen
 import com.keeghan.traidr.ui.screens.PostScreen
 import com.keeghan.traidr.ui.screens.ProfileScreen
 import com.keeghan.traidr.ui.screens.SettingsScreen
@@ -34,19 +35,21 @@ fun MainNavGraph(
             }
         }
         composable(route = BottomBarScreen.Post.route) {
-            PostScreen()
+            PostScreen(navController)
         }
         composable(route = BottomBarScreen.Profile.route) {
             ProfileScreen(
-                onSettingsClick = { navController.navigate(Graph.SETTINGS) },
+                onMyAdsClick = { navController.navigate(Graph.MYADS) },
                 onSignOutClick = {
                     onSignOut()
                 }
             )
-
         }
         composable(route = Graph.SETTINGS) {
             SettingsScreen()
+        }
+        composable(route = Graph.MYADS) {
+            MyAdsScreen(navController)
         }
 
         orderNavGraph(navController = navController)   //nested navigation for viewing ads

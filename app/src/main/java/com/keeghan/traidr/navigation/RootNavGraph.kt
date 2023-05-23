@@ -47,4 +47,5 @@ object Graph {
     const val MAIN = "main_graph"
     const val ORDER = "order_graph"
     const val SETTINGS = "settings"
+    const val MYADS = "myads"
 }

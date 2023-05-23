@@ -13,18 +13,18 @@ import javax.inject.Inject
 import javax.inject.Named
 
 /*
-* Viewmodel handling operations for a single product
+* ViewModel handling operations for a single product
 * */
 @HiltViewModel
 class ProductViewModel @Inject constructor(
     private val repository: ProductRepository,
     @Named("ioDispatcher") private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
-
-    private var _errorMsg: MutableLiveData<String> = MutableLiveData()
-    var errorMsg: LiveData<String> = _errorMsg
+    private var _message: MutableLiveData<String> = MutableLiveData()
+    var message: LiveData<String> = _message
 
     fun getProduct(productId: Int) {
+        _message.value = ""
         viewModelScope.launch(dispatcher) {
             try {
                 val response = repository.getProduct(productId)
@@ -36,12 +36,32 @@ class ProductViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 val msg = e.message.toString()
-                _errorMsg.value = msg
+                _message.value = msg
                 if (e.message.toString().contains("timeout")) {
-                    _errorMsg.postValue("Sever timeout, please try again")
+                    _message.postValue("Sever timeout, please try again")
                 }
                 if (msg.contains("Unable to resolve host")) {
-                    _errorMsg.postValue("Check Internet Connection")
+                    _message.postValue("Check Internet Connection")
+                }
+            }
+        }
+    }
+
+    fun deleteProduct(id: Int, token: String) {
+        _message.value = ""
+        viewModelScope.launch(dispatcher) {
+            try {
+                val response = repository.deleteProduct(token, id)
+                if (response.isSuccessful && response.code() == 204) {
+                    _message.postValue("success")
+                } else {
+                    _message.postValue(response.code().toString())
+                }
+            } catch (e: Exception) {
+                val msg = e.message.toString()
+                _message.postValue(msg)
+                if (msg.contains("timeout")) {
+                    _message.postValue("Server timeout, try Again")
                 }
             }
         }

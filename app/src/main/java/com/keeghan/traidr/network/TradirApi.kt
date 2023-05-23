@@ -1,7 +1,7 @@
 package com.keeghan.traidr.network
 
-import com.keeghan.traidr.models.product.ProductReqRes
 import com.keeghan.traidr.models.product.ProductReq
+import com.keeghan.traidr.models.product.ProductReqRes
 import com.keeghan.traidr.models.product.ProductResponse
 import com.keeghan.traidr.models.product.ProductsResponse
 import com.keeghan.traidr.models.user.NewUser
@@ -27,12 +27,10 @@ interface TradirApi {
         @Path("id") userId: Int,
     ): Response<LogoutResponse>
 
-    //Product
+
+    //Product Methods
     @GET("products/{id}")
     suspend fun getProduct(@Path("id") productId: Int): Response<ProductResponse>
-
-//    @GET("products")
-//    suspend fun getAllProduct(): Response<ProductsResponse>
 
     @GET //uses url
     suspend fun getAllProduct(@Url url: String): Response<ProductsResponse>
@@ -43,6 +41,9 @@ interface TradirApi {
         @Body productRequest: ProductReq,
     ): Response<ProductReqRes>
 
-
-
+    @DELETE("products/{id}")
+    suspend fun deleteProduct(
+        @Header("Authorization") token: String,
+        @Path("id") productId: Int,
+    ): Response<Unit>
 }

@@ -1,10 +1,11 @@
 package com.keeghan.traidr.di
 
-import android.preference.PreferenceManager
 import com.keeghan.traidr.network.TradirApi
 import com.keeghan.traidr.repository.UserRepository
 import com.keeghan.traidr.utils.Constants.Companion.BASE_URL
-import com.keeghan.traidr.utils.Constants.Companion.RETROFIT_TIMEOUT
+import com.keeghan.traidr.utils.Constants.Companion.RETROFIT_CONNECT_TIMEOUT
+import com.keeghan.traidr.utils.Constants.Companion.RETROFIT_READ_TIMEOUT
+import com.keeghan.traidr.utils.Constants.Companion.RETROFIT_WRITE_TIMEOUT
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,9 +32,9 @@ object AppServiceModule {
 
         logging.setLevel(HttpLoggingInterceptor.Level.BODY)
         okHttpClient.addInterceptor(logging)
-            .connectTimeout(RETROFIT_TIMEOUT, TimeUnit.SECONDS)
-            .readTimeout(RETROFIT_TIMEOUT, TimeUnit.SECONDS)
-            .writeTimeout(RETROFIT_TIMEOUT, TimeUnit.SECONDS)
+            .connectTimeout(RETROFIT_CONNECT_TIMEOUT, TimeUnit.SECONDS)
+            .readTimeout(RETROFIT_READ_TIMEOUT, TimeUnit.SECONDS)
+            .writeTimeout(RETROFIT_WRITE_TIMEOUT, TimeUnit.SECONDS)
         return okHttpClient
     }
 

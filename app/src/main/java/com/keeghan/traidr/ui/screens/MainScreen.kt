@@ -1,11 +1,16 @@
 package com.keeghan.traidr.ui.screens
 
 import android.app.Activity
-import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
@@ -78,35 +83,28 @@ fun RowScope.AddItem(
     currentDestination: NavDestination?,
     navController: NavHostController,
 ) {
-    NavigationBarItem(
-        label = {
-            Text(text = screen.title)
-        },
-        icon = {
-            val icon =
-                if (currentDestination?.hierarchy?.any { it.route == screen.route } == true) {
-                    screen.icon_focused
-                } else {
-                    screen.icon
-                }
-            Icon(
-                imageVector = icon,
-                contentDescription = "Navigation Icon"
-            )
-        },
-        selected = currentDestination?.hierarchy?.any {
-            it.route == screen.route
-        } == true,
+    NavigationBarItem(label = {
+        Text(text = screen.title)
+    }, icon = {
+        val icon = if (currentDestination?.hierarchy?.any { it.route == screen.route } == true) {
+            screen.icon_focused
+        } else {
+            screen.icon
+        }
+        Icon(
+            imageVector = icon, contentDescription = "Navigation Icon"
+        )
+    }, selected = currentDestination?.hierarchy?.any {
+        it.route == screen.route
+    } == true,
         // unselectedContentColor = LocalContentColor.current.copy(alpha = ContentAlpha.disabled),
         colors = NavigationBarItemDefaults.colors(
             unselectedIconColor = LocalContentColor.current.copy(alpha = 0.50f)
-        ),
-        onClick = {
+        ), onClick = {
             navController.navigate(screen.route) {
                 popUpTo(navController.graph.findStartDestination().id)
                 launchSingleTop = true
             }
-        }
-    )
+        })
 }
 

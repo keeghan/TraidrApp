@@ -41,6 +41,7 @@ fun SettingsScreen(
             enabled = true,
             state = state,
             onCheckedChange = {
+
                 settingsPref.saveThemeState(it)
                 //state.value = isDarkThemeEnabled
             }

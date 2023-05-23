@@ -19,8 +19,9 @@ class Constants {
 
 
         //values
-        const val NETWORK_TIMEOUT: Long = 11000
-        const val RETROFIT_TIMEOUT: Long = 11
+        const val RETROFIT_READ_TIMEOUT: Long = 15
+        const val RETROFIT_WRITE_TIMEOUT: Long = 11
+        const val RETROFIT_CONNECT_TIMEOUT: Long = 11
 
         //Settings
         const val SETTINGS_PREFERENCE = "settingsPreference"
