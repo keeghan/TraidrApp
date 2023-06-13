@@ -28,7 +28,6 @@ fun CategoryCard(
         shape = RoundedCornerShape(4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = Modifier
-            .padding(16.dp)
             .height(100.dp)  //width delegated to lazyList
             .clickable {
                 onCardClick(itemId)
@@ -42,6 +41,7 @@ fun CategoryCard(
                 modifier = Modifier.padding(4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Spacer(modifier = Modifier.weight(1f))
                 Image(
                     painter = painterResource(id = imageResId),
                     contentDescription = "Item",
@@ -57,6 +57,7 @@ fun CategoryCard(
                         lineHeight = 13.sp,
                     )
                 )
+                Spacer(modifier = Modifier.weight(1f))
             }
         }
     }

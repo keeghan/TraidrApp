@@ -4,11 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.keeghan.traidr.models.product.Product
+import com.keeghan.traidr.models.product.ProductReq
 import com.keeghan.traidr.models.product.ProductResponse
 import com.keeghan.traidr.models.product.ProductsResponse
 import com.keeghan.traidr.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
@@ -105,5 +110,9 @@ class ProductsViewModel @Inject constructor(
         }
     }
 
+
+    fun findAllProducts(): Flow<PagingData<Product>>{
+        return repository.findAllProducts().cachedIn(viewModelScope)
+    }
 
 }

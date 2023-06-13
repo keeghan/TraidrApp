@@ -2,7 +2,11 @@ package com.keeghan.traidr.ui.composables
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -23,6 +27,7 @@ import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.keeghan.traidr.R
+import java.net.URI
 
 @Composable
 fun ProductCard(
@@ -43,12 +48,17 @@ fun ProductCard(
         Column(
         ) {
             AsyncImage(  //Coil to load images
-                model = ImageRequest.Builder(LocalContext.current).data("recipe.imageUrl")
-                    .crossfade(true).networkCachePolicy(CachePolicy.ENABLED)
-                    .diskCachePolicy(CachePolicy.ENABLED).memoryCachePolicy(CachePolicy.ENABLED)
-                    .diskCachePolicy(CachePolicy.ENABLED).build(),
-                placeholder = painterResource(R.drawable.standin),
-                error = painterResource(R.drawable.standin),
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(
+                    "https://images.unsplash.com/photo-1605541885855-88863971e7b0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY4NTYyNDQ2Nw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080"
+                    )  //placeholder
+                    .crossfade(true)
+                    .networkCachePolicy(CachePolicy.ENABLED)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .build(),
+                error = (painterResource(R.drawable.home)),
+                placeholder = painterResource(R.drawable.home),
                 contentDescription = title,
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier

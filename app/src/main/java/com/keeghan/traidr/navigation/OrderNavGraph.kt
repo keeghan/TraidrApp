@@ -23,7 +23,7 @@ fun NavGraphBuilder.orderNavGraph(navController: NavController) {
             route = "${ViewAds.route}/{categoryId}",
             arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
         ) {
-            ViewAdsScreen(categoryId = it.arguments?.getInt("categoryId")!!)
+            ViewAdsScreen(navController,categoryId = it.arguments?.getInt("categoryId")!!)
         }
         composable(route = MakeOrder.route) {
             MakeOrderScreen()

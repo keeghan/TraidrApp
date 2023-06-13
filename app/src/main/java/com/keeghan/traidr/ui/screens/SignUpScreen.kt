@@ -14,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -93,6 +94,8 @@ fun SignUpScreen(
         verticalArrangement = Arrangement.Center
 
     ) {
+        Spacer(modifier = Modifier.weight(1f))
+
         if (loading) {
             CircularProgressIndicator() //indicate progress
         }
@@ -196,11 +199,18 @@ fun SignUpScreen(
         ) {
             Text("SignUp")
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Text(text = "Already have an Account",
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.clickable {
                 onLoginClick()
             })
+
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            "Sever needs a few calls to wake up",
+            style = MaterialTheme.typography.labelLarge
+        )
     }
 }
 

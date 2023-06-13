@@ -1,28 +1,21 @@
 package com.keeghan.traidr
 
-import androidx.test.platform.app.InstrumentationRegistry
+import android.content.Context
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.keeghan.traidr.network.TradirApi
-import com.keeghan.traidr.repository.UserRepository
-import com.keeghan.traidr.utils.Auth
-import com.keeghan.traidr.utils.Constants
-import com.keeghan.traidr.viewmodels.LoginViewModel
-import com.keeghan.traidr.viewmodels.SignUpViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-
-import org.junit.Test
-import org.junit.runner.RunWith
-
+import com.keeghan.traidr.repository.ProductRepository
+import com.keeghan.traidr.viewmodels.ProductViewModel
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.*
 import org.junit.Before
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import javax.inject.Inject
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -30,48 +23,54 @@ import java.util.concurrent.TimeUnit
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 @RunWith(AndroidJUnit4::class)
+@HiltAndroidTest
 class ExampleInstrumentedTest {
+//    @get:Rule(order = 0)
+//    var hiltRule = HiltAndroidRule(this)
 //
-//    private lateinit var userRepository: UserRepository
-//    private lateinit var viewModel: LoginViewModel
-//    private lateinit var auth: Auth
-//    val context = InstrumentationRegistry.getInstrumentation().targetContext
+//    @get:Rule(order = 1)
+//    val composeTestRule = createAndroidComposeRule<MainActivity>()
 //
-//    @OptIn(ExperimentalCoroutinesApi::class)
-//    private val testDispatcher = StandardTestDispatcher()
+////    @get:Rule(order = 2)
+////    val composeSingleRule = createComposeRule()
 //
+////    @Inject
+////    lateinit var userRepository: UserRepository
 //
-//    @OptIn(ExperimentalCoroutinesApi::class)
+//    @Inject
+//    lateinit var productRepository:ProductRepository
+//
+//    lateinit var viewModel :ProductViewModel
+//
 //    @Before
 //    fun setup() {
-//        val okHttpClient = OkHttpClient.Builder()
-//        val logging = HttpLoggingInterceptor()
-//        logging.setLevel(HttpLoggingInterceptor.Level.BODY)
-//        okHttpClient.addInterceptor(logging)
-//            .connectTimeout(10, TimeUnit.SECONDS)
-//            .readTimeout(10, TimeUnit.SECONDS)
-//            .writeTimeout(10, TimeUnit.SECONDS)
-//
-//        val api = Retrofit.Builder()
-//            .baseUrl(Constants.BASE_URL)
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .client(okHttpClient.build())
-//            .build()
-//            .create(TradirApi::class.java)
-//
-//        val auth = Auth(context)
-//
-//        userRepository = UserRepository(api)
-//        viewModel = LoginViewModel(userRepository, auth, testDispatcher)
+//        hiltRule.inject()
+//        val context = ApplicationProvider.getApplicationContext<Context>()
 //    }
 //
 //
 //    @Test
-//    fun signing_up_new_User_works() {
-//        //  val num = (100..99999).random()
-//        viewModel.logInWithEmail("Eghan250@gmail.com", "Androider55")
-//        assertTrue(viewModel.isSignInSuccess.value!!)
-//        //  assertFalse(viewModel.isSignInSuccess.value!!)
+//    fun testButtonClick() {
+//        composeTestRule.onRoot().printToLog("currentLabelExists")
+//        composeTestRule.onNode(
+//            hasText("Sever needs a few calls to wake up"),
+//            useUnmergedTree = true
+//        ).assertExists()
+//    }
+//
+//
+//    @Test
+//    fun testSomethingElse() {
+//         composeTestRule.onNodeWithText("Email").performTextInput("1@gmail.com")
+//        composeTestRule.onNodeWithText("Password").performTextInput("Androider69")
+//        composeTestRule.onNodeWithText("Login").performClick()
+//        composeTestRule.onRoot().printToLog("currentLabelExists")
+//
+////        composeTestRule.onNodeWithText("Email").assertIsDisplayed()
+////        composeTestRule.onNodeWithText("Password").assertExists()
+////        composeTestRule.onNodeWithText("Login").assertExists()
+//      //  Thread.sleep(5000)
+//        composeTestRule.onNode(hasText("Home"), useUnmergedTree = true).assertIsDisplayed()
 //    }
 
 }

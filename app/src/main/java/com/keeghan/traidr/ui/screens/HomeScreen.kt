@@ -28,7 +28,9 @@ fun HomeScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(text = "Home")
-        LazyVerticalGrid(columns = GridCells.Adaptive(120.dp)) {
+        LazyVerticalGrid(columns = GridCells.Adaptive(120.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(start = 10.dp, end = 10.dp)) {
             items(itemCategories) { it ->
                 CategoryCard(imageResId = it.resId,
                     itemId = it.id,
