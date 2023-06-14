@@ -3,15 +3,16 @@ package com.keeghan.traidr.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.filter
 import com.keeghan.traidr.models.product.Product
 import com.keeghan.traidr.models.product.ProductReq
 import com.keeghan.traidr.models.product.ProductReqRes
 import com.keeghan.traidr.models.product.ProductResponse
 import com.keeghan.traidr.models.product.ProductsResponse
-import com.keeghan.traidr.models.user.logout.LogoutResponse
 import com.keeghan.traidr.network.TradirApi
 import com.keeghan.traidr.repository.paging.AdsPagingSource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,16 +39,16 @@ class ProductRepository @Inject constructor(private val api: TradirApi) {
     }
 
 
-     fun findAllProducts(): Flow<PagingData<Product>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 20,
-            ),
-            pagingSourceFactory = {
-                AdsPagingSource(api)
-            }
-        ).flow
+    fun findAllProducts(): Flow<PagingData<Product>> {
+        return Pager(config = PagingConfig(
+            pageSize = 20,
+        ), pagingSourceFactory = {
+            AdsPagingSource(api)
+        }).flow
     }
 
-
+    fun findAllProducts(userId: String?): Flow<PagingData<Product>> {
+        val pager = Pager(PagingConfig(pageSize = 20)) { AdsPagingSource(api) }
+        return pager.flow.map { it.filter { product -> product.id == userId } }
+    }
 }

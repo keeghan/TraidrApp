@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.map
 import com.keeghan.traidr.models.product.Product
 import com.keeghan.traidr.models.product.ProductReq
 import com.keeghan.traidr.models.product.ProductResponse
@@ -14,6 +15,7 @@ import com.keeghan.traidr.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
@@ -89,30 +91,27 @@ class ProductsViewModel @Inject constructor(
     }
 
     fun deleteProduct(id: Int, token: String) {
-        _message.value = ""
         viewModelScope.launch(dispatcher) {
             try {
                 val response = repository.deleteProduct(token, id)
                 if (response.isSuccessful && response.code() == 204) {
                     _message.postValue("success")
                 } else {
-                    _message.postValue(response.code().toString())
+                    throw Exception("Error deleting product: ${response.code()}")
                 }
             } catch (e: Exception) {
-                val msg = e.message.toString()
-                _message.postValue(msg)
-                if (msg.contains("timeout")) {
-                    _message.postValue("Server timeout, try Again")
-                }
+                _message.postValue(e.message)
             } finally {
-               _deleteTracker.postValue(true)  //trigger reload after product deletion
+                _deleteTracker.postValue(true)  //trigger reload after product deletion
             }
         }
     }
-
 
     fun findAllProducts(): Flow<PagingData<Product>>{
         return repository.findAllProducts().cachedIn(viewModelScope)
     }
 
+    fun findAllProducts(userID: String): Flow<PagingData<Product>>{
+        return repository.findAllProducts(userID).cachedIn(viewModelScope)
+    }
 }

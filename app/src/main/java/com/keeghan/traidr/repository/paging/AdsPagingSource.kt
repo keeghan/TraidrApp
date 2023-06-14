@@ -34,11 +34,3 @@ class AdsPagingSource(
         }
     }
 }
-
-//todo: explain
-//"links": {
-//    "first": "/v1/products?page=1",
-//    "last": "/v1/products?page=1",
-//    "prev": "/v1/products",
-//    "next": "/v1/products"
-//}
